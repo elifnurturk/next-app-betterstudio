@@ -11,16 +11,14 @@ interface Filters {
   endDate: string;
 }
 
-const levelColors: Record<string, { border: string }> = {
-  ERROR: { border: '#d32f2f' },   // strong red
-  WARN: { border: '#f57c00' },    // strong orange
-  INFO: { border: '#1976d2' },    // strong blue
-  DEBUG: { border: '#616161' },   // dark gray
-  TRACE: { border: '#388e3c' },   // strong green
-  DEFAULT: { border: '#9e9e9e' }, // fallback gray
+const levelColors: Record<string, string> = {
+  ERROR: 'border-red-700',
+  WARN: 'border-yellow-600',
+  INFO: 'border-blue-700',
+  DEBUG: 'border-gray-600',
+  TRACE: 'border-green-700',
+  DEFAULT: 'border-gray-500',
 };
-
-const cardBackground = '#e6e0f8'; // soft lilac
 
 const LogViewer = () => {
   const [data, setData] = useState<string[]>([]);
@@ -109,46 +107,50 @@ const LogViewer = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>🚨 Log Viewer 🚨</h1>
+    <div className="bg-[#17182d] min-h-screen p-8 font-comic-sans text-white">
+      <h1 className="text-[#cf184a] text-3xl mb-6 text-center">🚨 Log Viewer 🚨</h1>
 
       <LogFilters filters={filters} onChange={handleFilterChange} />
 
-      {loading && <p style={styles.loading}>Loading... ⏳</p>}
+      {loading && <p className="text-center text-yellow-500">Loading... ⏳</p>}
 
-      {!loading && error && <p style={styles.error}>😿 {error}</p>}
+      {!loading && error && (
+        <p className="text-center text-[#cf184a] font-bold">😿 {error}</p>
+      )}
 
       {!loading && !error && filteredData.length === 0 && (
-        <p style={styles.loading}>No logs found with current filters... 💤</p>
+        <p className="text-center text-yellow-600">No logs found with current filters... 💤</p>
       )}
 
       {!loading && !error && filteredData.length > 0 && (
-        <ul style={styles.list}>
+        <ul className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 list-none p-0">
           {filteredData.map((item, index) => {
             const { level, message, date, serviceAction, id } = parseLog(item);
-            const colors = levelColors[level] || levelColors.DEFAULT;
+            const borderColorClass = levelColors[level] || levelColors.DEFAULT;
             const [service, action] = serviceAction.split(':');
 
             return (
               <li
                 key={id || index}
-                style={{
-                  ...styles.item,
-                  borderColor: colors.border,
-                  backgroundColor: cardBackground,
-                  color: '#222222',
-                }}
+                className={`p-4 rounded-lg border-4 ${borderColorClass} bg-[#e6e0f8] text-[#222222] flex flex-col justify-start h-[220px] overflow-hidden`}
               >
-                <div style={styles.cardHeader}>
-                  <strong style={styles.index}>{index + 1}.</strong>{' '}
-                  <span style={styles.date}>{date}</span>
+                <div className="mb-1 font-bold flex items-center">
+                  <strong className="text-purple-900 mr-2">{index + 1}.</strong>{' '}
+                  <span className="font-bold">{date}</span>
                 </div>
 
-                <div style={styles.filterCategories}>
-                  <em>Level:</em> <span>{level}</span> | <em>Service:</em> <span>{service}</span> | <em>Action:</em> <span>{action}</span>
+                <div className="mb-2 text-sm text-gray-600">
+                  <em>Level:</em> <span>{level}</span> |{' '}
+                  <em>Service:</em> <span>{service}</span> |{' '}
+                  <em>Action:</em> <span>{action}</span>
                 </div>
 
-                <p style={styles.message}>{message}</p>
+                <p
+                  className="text-gray-800 overflow-hidden text-ellipsis line-clamp-7 mt-0"
+                  style={{ WebkitBoxOrient: 'vertical' as any, display: '-webkit-box' }}
+                >
+                  {message}
+                </p>
               </li>
             );
           })}
@@ -158,94 +160,4 @@ const LogViewer = () => {
   );
 };
 
-const styles: Record<string, React.CSSProperties> = {
-  container: {
-    backgroundColor: '#17182d',
-    color: '#ffffff',
-    minHeight: '100vh',
-    padding: '2rem',
-    fontFamily: 'Comic Sans MS, cursive, sans-serif',
-  },
-  title: {
-    color: '#cf184a',
-    fontSize: '2rem',
-    marginBottom: '1.5rem',
-    textAlign: 'center',
-  },
-  list: {
-    listStyle: 'none',
-    padding: 0,
-    display: 'grid',
-    gap: '1rem',
-    gridTemplateColumns: 'repeat(4, 1fr)', // desktop: 4 in a row
-  },
-  item: {
-    padding: '1rem',
-    borderRadius: 10,
-    borderWidth: 4,
-    borderStyle: 'solid',
-    boxShadow: '0 0 10px rgba(0,0,0,0.1)',
-    fontSize: '0.9rem',
-    height: 220,
-    overflow: 'hidden',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
-    whiteSpace: 'normal',
-  },
-  cardHeader: {
-    marginBottom: 6,
-    fontWeight: 'bold',
-  },
-  filterCategories: {
-    marginBottom: 8,
-    fontSize: '0.85rem',
-    color: '#555',
-  },
-  index: {
-    color: '#5a2e91',
-    fontWeight: 'bold',
-    marginRight: 8,
-  },
-  date: {
-    fontWeight: 'bold',
-  },
-  message: {
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    display: '-webkit-box',
-    WebkitLineClamp: 7,
-    WebkitBoxOrient: 'vertical' as any,
-    marginTop: 0,
-    color: '#333',
-  },
-  loading: {
-    textAlign: 'center',
-    color: '#ca8c10',
-  },
-  error: {
-    color: '#cf184a',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-};
-
-// Responsive styles using a style tag
-const ResponsiveStyles = () => (
-  <style>{`
-    @media (max-width: 767px) {
-      ul {
-        grid-template-columns: repeat(2, 1fr) !important;
-      }
-    }
-  `}</style>
-);
-
-export default function LogViewerWrapper() {
-  return (
-    <>
-      <ResponsiveStyles />
-      <LogViewer />
-    </>
-  );
-}
+export default LogViewer;

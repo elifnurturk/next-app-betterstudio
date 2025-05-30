@@ -127,6 +127,7 @@ const LogViewer = () => {
           {filteredData.map((item, index) => {
             const { level, message, date, serviceAction, id } = parseLog(item);
             const colors = levelColors[level] || levelColors.DEFAULT;
+            const [service, action] = serviceAction.split(':');
 
             return (
               <li
@@ -138,11 +139,16 @@ const LogViewer = () => {
                   color: '#222222',
                 }}
               >
-                <div>
+                <div style={styles.cardHeader}>
                   <strong style={styles.index}>{index + 1}.</strong>{' '}
-                  <span style={styles.date}>{date}</span> | <em>{level}</em> | <span>{serviceAction}</span>
+                  <span style={styles.date}>{date}</span>
                 </div>
-                <span style={styles.message}>{message}</span>
+
+                <div style={styles.filterCategories}>
+                  <em>Level:</em> <span>{level}</span> | <em>Service:</em> <span>{service}</span> | <em>Action:</em> <span>{action}</span>
+                </div>
+
+                <p style={styles.message}>{message}</p>
               </li>
             );
           })}
@@ -171,7 +177,7 @@ const styles: Record<string, React.CSSProperties> = {
     padding: 0,
     display: 'grid',
     gap: '1rem',
-    gridTemplateColumns: 'repeat(4, 1fr)', // default 4 columns
+    gridTemplateColumns: 'repeat(4, 1fr)', // desktop: 4 in a row
   },
   item: {
     padding: '1rem',
@@ -180,12 +186,21 @@ const styles: Record<string, React.CSSProperties> = {
     borderStyle: 'solid',
     boxShadow: '0 0 10px rgba(0,0,0,0.1)',
     fontSize: '0.9rem',
-    height: 180,
+    height: 220,
     overflow: 'hidden',
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     whiteSpace: 'normal',
+  },
+  cardHeader: {
+    marginBottom: 6,
+    fontWeight: 'bold',
+  },
+  filterCategories: {
+    marginBottom: 8,
+    fontSize: '0.85rem',
+    color: '#555',
   },
   index: {
     color: '#5a2e91',
@@ -199,8 +214,10 @@ const styles: Record<string, React.CSSProperties> = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     display: '-webkit-box',
-    WebkitLineClamp: 5,
+    WebkitLineClamp: 7,
     WebkitBoxOrient: 'vertical' as any,
+    marginTop: 0,
+    color: '#333',
   },
   loading: {
     textAlign: 'center',
@@ -213,10 +230,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
 };
 
-// Add responsive CSS with a style tag or external stylesheet:
-
-// To inject responsive styles in React inline, you can add a <style> tag in the component:
-
+// Responsive styles using a style tag
 const ResponsiveStyles = () => (
   <style>{`
     @media (max-width: 767px) {

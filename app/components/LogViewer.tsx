@@ -124,7 +124,7 @@ const LogViewer = () => {
 
   return (
     <div className="bg-[#17182d] min-h-screen p-8 font-comic-sans text-white">
-      <h1 className="text-[#cf184a] text-3xl mb-6 text-center">🚨 Log Viewer 🚨</h1>
+      <h1 className="text-[#cf184a] text-3xl mb-6 text-center">Log Viewer </h1>
 
       <LogFilters filters={filters} onChange={handleFilterChange} />
 
@@ -148,9 +148,9 @@ const LogViewer = () => {
             return (
               <li
                 key={id || index}
-                className={`p-4 rounded-xl border-l-8 ${borderColorClass} bg-gradient-to-br from-[#e6e0f8] to-[#f8e0e6] text-[#222222] shadow-lg transition-transform transform hover:scale-[1.02]`}
+                className={`p-4 rounded-xl border-l-8 ${borderColorClass} bg-gradient-to-br from-[#e6e0f8] to-[#baa3e4] text-[#222222] shadow-lg transition-transform transform hover:scale-[1.02]`}
               >
-                <div className="mb-2 font-bold flex items-center justify-between text-sm text-purple-900">
+                <div className="mb-2 font-bold flex items-center justify-between  text-purple-900">
                   <span>#{index + 1}</span>
                   <span>{formatDateWithDay(date)}</span>
                 </div>
@@ -162,7 +162,7 @@ const LogViewer = () => {
                   <div><strong>User ID:</strong> {id || '—'}</div>
                 </div>
 
-                <p className="text-gray-800 text-sm overflow-hidden text-ellipsis line-clamp-6 mt-2">
+                <p className="text-gray-800  overflow-hidden text-ellipsis line-clamp-6 mt-2">
                   {message}
                 </p>
               </li>

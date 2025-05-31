@@ -3,7 +3,7 @@ import LogViewer from './components/LogViewer';
 
 const Page = () => {
   return (
-    <main>
+    <main className='flex mx-auto container'>
       <LogViewer />
     </main>
   );

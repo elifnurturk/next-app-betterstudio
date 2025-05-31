@@ -38,6 +38,15 @@ const LogViewer = () => {
     message: '',
   });
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 20;
+  const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
+
+  const currentData = filteredData.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
   const formatDateWithDay = (dateStr: string) => {
     const date = new Date(dateStr);
     return date.toLocaleString('en-US', {
@@ -105,6 +114,7 @@ const LogViewer = () => {
     });
 
     setFilteredData(filtered);
+    setCurrentPage(1); // Reset to page 1 on filters change
   }, [data, filters]);
 
   const handleFilterChange = (newFilters: Partial<Filters>) => {
@@ -124,8 +134,9 @@ const LogViewer = () => {
 
   return (
     <div className="bg-[#17182d] min-h-screen p-8 font-comic-sans text-white">
-      <h1 className="text-[#cf184a] text-3xl mb-6 text-center">Log Viewer </h1>
-
+<h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-center text-white mb-8 font-sans">
+  <span className="text-[#cf184a] drop-shadow-md">Log Viewer</span>
+</h1>
       <LogFilters filters={filters} onChange={handleFilterChange} />
 
       {loading && <p className="text-center text-yellow-500">Loading... ⏳</p>}
@@ -139,36 +150,84 @@ const LogViewer = () => {
       )}
 
       {!loading && !error && filteredData.length > 0 && (
-        <ul className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 list-none p-0">
-          {filteredData.map((item, index) => {
-            const { level, message, date, serviceAction, id } = parseLog(item);
-            const borderColorClass = levelColors[level] || levelColors.DEFAULT;
-            const [service, action] = serviceAction.split(':');
+        <>
+          <ul className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 list-none p-0">
+            {currentData.map((item, index) => {
+              const { level, message, date, serviceAction, id } = parseLog(item);
+              const borderColorClass = levelColors[level] || levelColors.DEFAULT;
+              const [service, action] = serviceAction.split(':');
 
-            return (
-              <li
-                key={id || index}
-                className={`p-4 rounded-xl border-l-8 ${borderColorClass} bg-gradient-to-br from-[#e6e0f8] to-[#baa3e4] text-[#222222] shadow-lg transition-transform transform hover:scale-[1.02]`}
-              >
-                <div className="mb-2 font-bold flex items-center justify-between  text-purple-900">
-                  <span>#{index + 1}</span>
-                  <span>{formatDateWithDay(date)}</span>
-                </div>
+              return (
+                <li
+                  key={id || index}
+                  className={`p-4 rounded-xl border-l-8 ${borderColorClass} bg-gradient-to-br from-[#e6e0f8] to-[#baa3e4] text-[#222222] shadow-lg transition-transform transform hover:scale-[1.02]`}
+                >
+                  <div className="mb-2 font-bold flex items-center justify-between text-purple-900">
+                    <span>#{(currentPage - 1) * ITEMS_PER_PAGE + index + 1}</span>
+                    <span>{formatDateWithDay(date)}</span>
+                  </div>
 
-                <div className="mb-2 text-xs text-gray-600 space-y-1">
-                  <div><strong>Level:</strong> {level}</div>
-                  <div><strong>Service:</strong> {service}</div>
-                  <div><strong>Action:</strong> {action}</div>
-                  <div><strong>User ID:</strong> {id || '—'}</div>
-                </div>
+                  <div className="mb-2 text-xs text-gray-600 space-y-1">
+                    <div><strong>Level:</strong> {level}</div>
+                    <div><strong>Service:</strong> {service}</div>
+                    <div><strong>Action:</strong> {action}</div>
+                    <div><strong>User ID:</strong> {id || '—'}</div>
+                  </div>
 
-                <p className="text-gray-800  overflow-hidden text-ellipsis line-clamp-6 mt-2">
-                  {message}
-                </p>
-              </li>
-            );
-          })}
-        </ul>
+                  <p className="text-gray-800 overflow-hidden text-ellipsis line-clamp-6 mt-2">
+                    {message}
+                  </p>
+                </li>
+              );
+            })}
+          </ul>
+
+          {/* Pagination */}
+          <div className="flex justify-center mt-6 gap-2 flex-wrap items-center text-white">
+  <button
+    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+    disabled={currentPage === 1}
+    className="px-4 py-2 rounded bg-[#832267] hover:bg-[#6a1b57] disabled:opacity-40"
+  >
+    ⬅ Prev
+  </button>
+
+  {Array.from({ length: totalPages }, (_, i) => i + 1)
+    .filter(
+      (page) =>
+        page === 1 ||
+        page === totalPages ||
+        (page >= currentPage - 2 && page <= currentPage + 2)
+    )
+    .map((page, idx, arr) => {
+      const prev = arr[idx - 1];
+      const showDots = prev && page - prev > 1;
+      return (
+        <React.Fragment key={page}>
+          {showDots && <span className="px-2 text-gray-400">…</span>}
+          <button
+            onClick={() => setCurrentPage(page)}
+            className={`px-3 py-1 rounded ${
+              currentPage === page
+                ? 'bg-[#832267] text-black font-bold'
+                : 'bg-gray-700 hover:bg-gray-600'
+            }`}
+          >
+            {page}
+          </button>
+        </React.Fragment>
+      );
+    })}
+
+  <button
+    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+    disabled={currentPage === totalPages}
+    className="px-4 py-2 rounded bg-[#c690d6] hover:bg-[#573558] disabled:opacity-40 text-black"
+  >
+    Next ➡
+  </button>
+</div>
+        </>
       )}
     </div>
   );

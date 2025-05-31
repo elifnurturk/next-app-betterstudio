@@ -1,4 +1,6 @@
-﻿import React, { useState, useRef, useEffect } from 'react';
+﻿// LogFilters.tsx
+
+import React, { useState, useRef, useEffect } from 'react';
 
 interface Filters {
   level: string;
@@ -7,6 +9,7 @@ interface Filters {
   startDate: string;
   endDate: string;
   userId: string;
+  message: string;
 }
 
 interface LogFiltersProps {
@@ -27,6 +30,7 @@ export default function LogFilters({ filters, onChange }: LogFiltersProps) {
     { type: 'text', label: 'Service', name: 'service', placeholder: 'Filter by service', value: filters.service },
     { type: 'text', label: 'Action', name: 'action', placeholder: 'Filter by action', value: filters.action },
     { type: 'text', label: 'User ID', name: 'userId', placeholder: 'Filter by user ID', value: filters.userId },
+    { type: 'text', label: 'Message', name: 'message', placeholder: 'Filter by message', value: filters.message },
   ];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {

@@ -10,6 +10,7 @@ interface Filters {
   startDate: string;
   endDate: string;
   userId: string;
+  message: string;
 }
 
 const levelColors: Record<string, string> = {
@@ -34,6 +35,7 @@ const LogViewer = () => {
     startDate: '',
     endDate: '',
     userId: '',
+    message: '',
   });
 
   const formatDateWithDay = (dateStr: string) => {
@@ -88,7 +90,7 @@ const LogViewer = () => {
     };
 
     filtered = filtered.filter((log) => {
-      const { date, level, serviceAction, id } = parseLog(log);
+      const { date, level, serviceAction, id, message } = parseLog(log);
       const [service, action] = serviceAction.split(':');
 
       if (filters.level && level !== filters.level.toUpperCase()) return false;
@@ -97,6 +99,7 @@ const LogViewer = () => {
       if (filters.startDate && new Date(date) < new Date(filters.startDate)) return false;
       if (filters.endDate && new Date(date) > new Date(filters.endDate + 'T23:59:59')) return false;
       if (filters.userId && id !== filters.userId) return false;
+      if (filters.message && !message.toLowerCase().includes(filters.message.toLowerCase())) return false;
 
       return true;
     });
@@ -159,10 +162,7 @@ const LogViewer = () => {
                   <div><strong>User ID:</strong> {id || '—'}</div>
                 </div>
 
-                <p
-                  className="text-gray-800 text-sm overflow-hidden text-ellipsis line-clamp-6 mt-2"
-                  style={{ WebkitBoxOrient: 'vertical' as any, display: '-webkit-box' }}
-                >
+                <p className="text-gray-800 text-sm overflow-hidden text-ellipsis line-clamp-6 mt-2">
                   {message}
                 </p>
               </li>

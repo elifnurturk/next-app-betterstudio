@@ -6,6 +6,7 @@ interface Filters {
   action: string;
   startDate: string;
   endDate: string;
+  userId: string;
 }
 
 interface LogFiltersProps {
@@ -25,6 +26,7 @@ export default function LogFilters({ filters, onChange }: LogFiltersProps) {
     { type: 'select', label: 'Level', name: 'level', value: filters.level, options: LEVELS },
     { type: 'text', label: 'Service', name: 'service', placeholder: 'Filter by service', value: filters.service },
     { type: 'text', label: 'Action', name: 'action', placeholder: 'Filter by action', value: filters.action },
+    { type: 'text', label: 'User ID', name: 'userId', placeholder: 'Filter by user ID', value: filters.userId },
   ];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {

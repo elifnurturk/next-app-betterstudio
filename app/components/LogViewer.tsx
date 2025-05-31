@@ -9,6 +9,7 @@ interface Filters {
   action: string;
   startDate: string;
   endDate: string;
+  userId: string;
 }
 
 const levelColors: Record<string, string> = {
@@ -32,7 +33,20 @@ const LogViewer = () => {
     action: '',
     startDate: '',
     endDate: '',
+    userId: '',
   });
+
+  const formatDateWithDay = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -74,16 +88,15 @@ const LogViewer = () => {
     };
 
     filtered = filtered.filter((log) => {
-      const { date, level, serviceAction } = parseLog(log);
+      const { date, level, serviceAction, id } = parseLog(log);
       const [service, action] = serviceAction.split(':');
 
       if (filters.level && level !== filters.level.toUpperCase()) return false;
-      if (filters.service && !service.toLowerCase().includes(filters.service.toLowerCase()))
-        return false;
-      if (filters.action && !action.toLowerCase().includes(filters.action.toLowerCase()))
-        return false;
+      if (filters.service && !service.toLowerCase().includes(filters.service.toLowerCase())) return false;
+      if (filters.action && !action.toLowerCase().includes(filters.action.toLowerCase())) return false;
       if (filters.startDate && new Date(date) < new Date(filters.startDate)) return false;
       if (filters.endDate && new Date(date) > new Date(filters.endDate + 'T23:59:59')) return false;
+      if (filters.userId && id !== filters.userId) return false;
 
       return true;
     });
@@ -132,21 +145,22 @@ const LogViewer = () => {
             return (
               <li
                 key={id || index}
-                className={`p-4 rounded-lg border-4 ${borderColorClass} bg-[#e6e0f8] text-[#222222] flex flex-col justify-start h-[220px] overflow-hidden`}
+                className={`p-4 rounded-xl border-l-8 ${borderColorClass} bg-gradient-to-br from-[#e6e0f8] to-[#f8e0e6] text-[#222222] shadow-lg transition-transform transform hover:scale-[1.02]`}
               >
-                <div className="mb-1 font-bold flex items-center">
-                  <strong className="text-purple-900 mr-2">{index + 1}.</strong>{' '}
-                  <span className="font-bold">{date}</span>
+                <div className="mb-2 font-bold flex items-center justify-between text-sm text-purple-900">
+                  <span>#{index + 1}</span>
+                  <span>{formatDateWithDay(date)}</span>
                 </div>
 
-                <div className="mb-2 text-sm text-gray-600">
-                  <em>Level:</em> <span>{level}</span> |{' '}
-                  <em>Service:</em> <span>{service}</span> |{' '}
-                  <em>Action:</em> <span>{action}</span>
+                <div className="mb-2 text-xs text-gray-600 space-y-1">
+                  <div><strong>Level:</strong> {level}</div>
+                  <div><strong>Service:</strong> {service}</div>
+                  <div><strong>Action:</strong> {action}</div>
+                  <div><strong>User ID:</strong> {id || '—'}</div>
                 </div>
 
                 <p
-                  className="text-gray-800 overflow-hidden text-ellipsis line-clamp-7 mt-0"
+                  className="text-gray-800 text-sm overflow-hidden text-ellipsis line-clamp-6 mt-2"
                   style={{ WebkitBoxOrient: 'vertical' as any, display: '-webkit-box' }}
                 >
                   {message}
